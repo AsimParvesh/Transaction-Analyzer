@@ -2,6 +2,7 @@
 import streamlit as st
 import pandas as pd
 import openai
+from openai import OpenAI
 from utils.parser import extract_transactions_from_pdf
 
 # Load API key securely
@@ -38,7 +39,9 @@ Focus on:
 
         st.subheader("📬 Generating Financial Insights...")
         with st.spinner("Thinking..."):
-            response = openai.ChatCompletion.create(
+            client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+            
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a financial advisor AI."},
@@ -46,5 +49,5 @@ Focus on:
                 ],
                 temperature=0.7
             )
-            insight = response["choices"][0]["message"]["content"]
+            insight = response.choices[0].message.content
             st.markdown(insight)
