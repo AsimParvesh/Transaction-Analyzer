@@ -29,7 +29,7 @@ if uploaded_file:
 
         with st.spinner("Thinking..."):
             try:
-                model = genai.GenerativeModel(model_name="gemini-pro")
+                model = genai.GenerativeModel(model_name="gemini-1.5-pro-001")
                 response = model.generate_content(
                     f"""
 You are a smart financial advisor. Analyze the following UPI transactions and return:
