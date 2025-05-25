@@ -2,7 +2,7 @@
 import streamlit as st
 import pandas as pd
 import openai
-from openai import OpenAI
+import google.generativeai as genai
 from utils.parser import extract_transactions_from_pdf
 
 # Load API key securely
@@ -36,18 +36,27 @@ Focus on:
 - Any patterns or excess spending
 - Savings advice
 """
+# Load Gemini API key
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-        st.subheader("📬 Generating Financial Insights...")
+        st.subheader("📬 Generating Financial Insights with Gemini...")
         with st.spinner("Thinking..."):
-            client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-            
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a financial advisor AI."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.7
-            )
-            insight = response.choices[0].message.content
-            st.markdown(insight)
+            model = genai.GenerativeModel("gemini-pro")
+            prompt_parts = [
+                "You are a financial advisor AI. Analyze the following UPI transactions and return insights:",
+                df.to_string(index=False),
+                """
+        Return:
+        - Total spending
+        - Refunds and frequency
+        - Patterns in spending
+        - Suggestions to improve savings
+        - Budget planning tips
+        Present everything in clean markdown.
+        """
+            ]
+            try:
+                response = model.generate_content(prompt_parts)
+                st.markdown(response.text)
+            except Exception as e:
+                st.error(f"❌ Gemini API error: {e}")
