@@ -5,8 +5,6 @@ import openai
 import google.generativeai as genai
 from utils.parser import extract_transactions_from_pdf
 
-# Load API key securely
-openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.set_page_config(page_title="📄 UPI Analyzer", layout="centered")
 st.title("📊 UPI Financial Analyzer (Offline Version)")
