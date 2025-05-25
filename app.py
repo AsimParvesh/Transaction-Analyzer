@@ -36,27 +36,28 @@ Focus on:
 - Any patterns or excess spending
 - Savings advice
 """
+
 # Load Gemini API key
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-        st.subheader("📬 Generating Financial Insights with Gemini...")
-        with st.spinner("Thinking..."):
-            model = genai.GenerativeModel("gemini-pro")
-            prompt_parts = [
-                "You are a financial advisor AI. Analyze the following UPI transactions and return insights:",
-                df.to_string(index=False),
-                """
-        Return:
-        - Total spending
-        - Refunds and frequency
-        - Patterns in spending
-        - Suggestions to improve savings
-        - Budget planning tips
-        Present everything in clean markdown.
+st.subheader("📬 Generating Financial Insights with Gemini...")
+with st.spinner("Thinking..."):
+    model = genai.GenerativeModel("gemini-pro")
+    prompt_parts = [
+        "You are a financial advisor AI. Analyze the following UPI transactions and return insights:",
+        df.to_string(index=False),
         """
-            ]
-            try:
-                response = model.generate_content(prompt_parts)
-                st.markdown(response.text)
-            except Exception as e:
-                st.error(f"❌ Gemini API error: {e}")
+Return:
+- Total spending
+- Refunds and frequency
+- Patterns in spending
+- Suggestions to improve savings
+- Budget planning tips
+Present everything in clean markdown.
+"""
+    ]
+    try:
+        response = model.generate_content(prompt_parts)
+        st.markdown(response.text)
+    except Exception as e:
+        st.error(f"❌ Gemini API error: {e}")
