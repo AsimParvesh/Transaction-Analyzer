@@ -21,47 +21,32 @@ if uploaded_file:
         st.success(f"✅ Extracted {len(df)} transactions")
         st.dataframe(df)
 
-        # Generate insights using LLM
-        prompt = f"""
-You are a financial analyst assistant. A user has shared their UPI transaction summary. Analyze the following data and return insights in bullet points, followed by a short monthly budget recommendation:
+        # ✅ Gemini insight generation AFTER df is defined
+        import google.generativeai as genai
+        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-{df.to_string(index=False)}
+        st.subheader("📬 Generating Financial Insights with Gemini...")
 
-Focus on:
-- Total spending
-- Top spending categories (if guessable)
-- Refunds and frequency
-- Any patterns or excess spending
-- Savings advice
-"""
-
-import google.generativeai as genai
-
-# Configure Gemini with your secret key
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-
-st.subheader("📬 Generating Financial Insights with Gemini...")
-
-with st.spinner("Thinking..."):
-    try:
-        model = genai.GenerativeModel(model_name="gemini-pro")
-        response = model.generate_content(
-            f"""
+        with st.spinner("Thinking..."):
+            try:
+                model = genai.GenerativeModel(model_name="gemini-pro")
+                response = model.generate_content(
+                    f"""
 You are a smart financial advisor. Analyze the following UPI transactions and return:
 
 - Total spending
 - Any repeating expenses
 - Refunds
-- Any wasteful spending patterns
+- Wasteful spending patterns
 - Personalized money-saving advice
 
-Format it as bullet points. Keep it conversational and helpful.
+Format as clean bullet points.
 
 Transactions:
 {df.to_string(index=False)}
-""")
-        st.markdown(response.text)
+"""
+                )
+                st.markdown(response.text)
 
-    except Exception as e:
-        st.error(f"❌ Gemini API error: {e}")
-
+            except Exception as e:
+                st.error(f"❌ Gemini API error: {e}")
