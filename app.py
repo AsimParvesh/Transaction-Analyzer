@@ -35,27 +35,29 @@ Focus on:
 - Savings advice
 """
 
-# Load Gemini API key
+import google.generativeai as genai
+
+# Configure Gemini
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
 st.subheader("📬 Generating Financial Insights with Gemini...")
+
 with st.spinner("Thinking..."):
-    model = genai.GenerativeModel("gemini-pro")
-    prompt_parts = [
-        "You are a financial advisor AI. Analyze the following UPI transactions and return insights:",
-        df.to_string(index=False),
-        """
+    try:
+        model = genai.GenerativeModel("models/gemini-pro")  # full model name
+        chat = model.start_chat()
+        response = chat.send_message(f"""
+You are a financial assistant. Analyze the following UPI transactions and return bullet-point insights:
+{df.to_string(index=False)}
+
 Return:
 - Total spending
-- Refunds and frequency
-- Patterns in spending
-- Suggestions to improve savings
-- Budget planning tips
-Present everything in clean markdown.
-"""
-    ]
-    try:
-        response = model.generate_content(prompt_parts)
+- Frequent senders/receivers
+- Refund frequency
+- Excess/wasteful spending
+- Personalized savings tips
+""")
         st.markdown(response.text)
+
     except Exception as e:
         st.error(f"❌ Gemini API error: {e}")
