@@ -20,10 +20,27 @@ def extract_transactions_from_pdf(pdf_file):
                 date = line.strip()
                 description = lines[i+1].strip()
                 amount_line = lines[i+2].strip()
-                amount_match = re.search(r"([+-]\s*Rs\.?\s?\d+[,.]?\d*)", amount_line)
+                amount_match = re.search(r"([+-]?\s*Rs\.?\s?\d+[,.]?\d*)", amount_line)
                 if amount_match:
-                    amount = amount_match.group(1).replace(" ", "").replace("Rs", "").replace("+", "").replace(",", "")
-                    amount = float(amount) if "-" not in amount_line else -float(amount)
+                    raw = amount_match.group(1)
+                    # Clean and normalize
+                    cleaned = (
+                        raw.replace("Rs", "")
+                           .replace(" ", "")
+                           .replace(",", "")
+                           .replace("+", "")
+                           .replace("−", "-")  # handle special minus symbol
+                    )
+                    try:
+                        amount = float(cleaned)
+                        transactions.append({
+                            "Date": date,
+                            "Description": description,
+                            "Amount": amount
+                        })
+                    except ValueError:
+                        continue  # skip this row if still bad
+
                     transactions.append({
                         "Date": date,
                         "Description": description,
