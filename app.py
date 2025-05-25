@@ -39,7 +39,7 @@ Focus on:
 
         st.subheader("📬 Generating Financial Insights...")
         with st.spinner("Thinking..."):
-            client = OpenAI(api_key=st.secrets["sk-...q0cA"])
+            client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
             
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
