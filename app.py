@@ -1,7 +1,6 @@
 
 import streamlit as st
 import pandas as pd
-import openai
 import google.generativeai as genai
 from utils.parser import extract_transactions_from_pdf
 
